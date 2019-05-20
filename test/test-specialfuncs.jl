@@ -106,14 +106,12 @@ using Compat.Test
     @test expand_func(jn(0, x)) == sin(x)/x
     @test expand_func(jn(1, x)) == sin(x)/x^2 - cos(x)/x
     @test rewrite(jn(ν, x), "besselj") == sqrt(2PI/x)*besselj(ν + Sym(1)/2, x)/2
-    VERSION < v"0.6.0-dev" && @test rewrite(jn(ν, x), "bessely") == (-1)^ν*sqrt(2PI/x)*bessely(-ν - Sym(1)/2, x)/2
     u = N(jn(2, 5.2+0.3im), 20)
     @test norm(real(u) - 0.099419756723640344491) <= 1e-15 && norm(imag(u) + 0.054525080242173562897) <= 1e-15
 
 
     @test expand_func(yn(0, x)) == -cos(x)/x
     @test expand_func(yn(1, x)) == -cos(x)/x^2-sin(x)/x
-    VERSION < v"0.6.0-dev" && @test rewrite(yn(ν, x), "besselj") == (-1)^(ν + 1)*sqrt(2PI/x)*besselj(-ν - Sym(1)/2, x)/2
     @test rewrite(yn(ν, x), "bessely") == sqrt(2PI/x)*bessely(ν + Sym(1)/2, x)/2
     @test N(yn(2, 5.2+0.3im)) ≈ 0.18525034196069722536 + 0.014895573969924817587im
 
@@ -134,7 +132,7 @@ using Compat.Test
     # test numerical consistency with Julia functions
     @test N(gamma(Sym(4.1))) ≈ gamma(4.1)
     @test N(polygamma(Sym(2), Sym(3.2))) ≈ polygamma(2, 3.2)
-    VERSION >= v"0.5.0" && @test N(beta(Sym(1)+1im, Sym(1)+1im)) ≈ beta(1.0+1im, 1.0+1im)
+    @test N(beta(Sym(1)+1im, Sym(1)+1im)) ≈ beta(1.0+1im, 1.0+1im)
 
 
     # Elliptic-type functions
@@ -167,12 +165,6 @@ using Compat.Test
 
 
     # test numerical consistency with Julia functions
-    if VERSION < v"0.6.0-dev"
-      @test N(besselj(3.2, Sym(1.5))) ≈ besselj(3.2, 1.5)
-      @test N(bessely(3.2, Sym(1.5))) ≈ bessely(3.2, 1.5)
-      @test N(besseli(3.2, Sym(1.5))) ≈ besseli(3.2, 1.5)
-      @test N(besselk(3.2, Sym(1.5))) ≈ besselk(3.2, 1.5)
-    end
 
     @test expand_func(x*hyper([1, 1], [2], -x)) == log(x + 1)
 end
