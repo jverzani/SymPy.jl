@@ -643,6 +643,11 @@ end
     @vars x
     @test abs2(x) == x*conj(x)
 
+    ## issue 363 lambdify atan
+    @vars x y
+    @test lambdify(atan(x, y))(2, -1) ≈ atan(2, -1)
+    
+
 end
 
 @testset "generic programming, issue 223" begin
@@ -684,4 +689,5 @@ end
 
     ## issue with `pycall_hasproperty` and nothing values.
     @test !SymPy.is_rational(Sym(2.5))
+
 end

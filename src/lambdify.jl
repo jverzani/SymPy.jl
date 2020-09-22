@@ -36,6 +36,7 @@ end
 __prod__(args...) =  prod(args)
 export __prod__
 
+
 fn_map = Dict(
               "Add" => :+,
               "Sub" => :-,
@@ -61,7 +62,8 @@ fn_map = Dict(
               "StrictGreaterThan" => :(>),
               "GreaterThan" => :(>=),
 "Greater" => :(>),
-"conjugate" => :conj
+    "conjugate" => :conj,
+    "atan2" => atan
               )
 
 map_fn(key, fn_map) = haskey(fn_map, key) ? fn_map[key] : Symbol(key)
