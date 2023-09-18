@@ -60,9 +60,30 @@ export Lambda
 ## important override
 ## this allows most things to flow though PyCall
 PyCall.PyObject(x::SymbolicObject) = x.__pyobject__
+
 ## Override this so that using symbols as keys in a dict works
-hash(x::SymbolicObject, salt::UInt64) = hash(PyObject(x), salt)
-hash(x::SymbolicObject) = hash(PyObject(x))
+const pysalt = hash("PyCall.PyObject") # "salt" to mix in to PyObject hashes
+function hash(s::SymbolicObject, salt::UInt64=pysalt)
+    o = PyObject(s)
+    if ispynull(o)
+        hash(C_NULL, salt)
+    elseif PyCall.is_pyjlwrap(o)
+        # call native Julia hash directly on wrapped Julia objects,
+        # since on 64-bit Windows the Python 2.x hash is only 32 bits
+        hash(PyCall.unsafe_pyjlwrap_to_objref(o), salt)
+    else
+        h = ccall((PyCall.@pysym :PyObject_Hash), PyCall.Py_hash_t, (PyCall.PyPtr,), o)
+        if h == -1 # error
+            PyCall.pyerr_clear()
+            return hash(PyCall.PyPtr(o), salt)
+        end
+        hash(h,salt)
+    end
+end
+
+
+#hash(x::SymbolicObject, salt::UInt64) = hash(PyObject(x), salt)
+#hash(x::SymbolicObject) = hash(PyObject(x))
 ==(x::SymbolicObject, y::SymbolicObject) = PyObject(x) == PyObject(y)
 
 ##################################################
